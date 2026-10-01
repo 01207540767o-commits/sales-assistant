@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مساعد المبيعات</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Tahoma,sans-serif;background:#f5f7fb;color:#18202a;display:flex;min-height:100vh}.sidebar{width:245px;background:#111827;color:#fff;padding:24px 14px;position:fixed;right:0;top:0;bottom:0}.brand{font-size:22px;font-weight:800;padding:0 12px 28px}.brand span{color:#5eead4;margin-right:5px}.nav{display:block;width:100%;border:0;background:transparent;color:#cbd5e1;text-align:right;padding:13px 14px;border-radius:10px;margin:4px 0;font-size:15px;cursor:pointer}.nav:hover,.nav.active{background:#1f2937;color:#fff}.main{margin-right:245px;width:calc(100% - 245px);padding:28px;max-width:1400px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.topbar h1{margin:0 0 7px}.topbar p,.muted{color:#64748b}.primary{background:#0f766e;color:#fff;border:0;border-radius:9px;padding:11px 16px;font-weight:700;cursor:pointer}.ghost{background:transparent;border:0;color:#0f766e;cursor:pointer}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.card,.panel{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(15,23,42,.04)}.card span{display:block;color:#64748b;font-size:14px;margin-bottom:12px}.card strong{font-size:25px}.panel{margin-bottom:20px}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.panel h2{margin-top:0}.section{display:none}.section.active{display:block}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:13px;border-bottom:1px solid #eef2f7;text-align:right;white-space:nowrap}.table th{color:#64748b;font-size:13px}.badge{padding:5px 9px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:12px}.empty{padding:35px;text-align:center;color:#94a3b8}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0}.form-grid label{font-weight:700;color:#334155}.form-grid input{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font-size:15px}textarea{width:100%;min-height:180px;padding:14px;border:1px solid #cbd5e1;border-radius:10px;resize:vertical;margin:12px 0;font-family:inherit}.result,.profit-result{margin-top:18px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:10px;padding:15px;line-height:1.8}.profit-result{font-size:22px;font-weight:800}.hidden{display:none!important}.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:20px}.modal-box{background:#fff;border-radius:14px;padding:25px;width:min(520px,100%);position:relative}.close{position:absolute;left:15px;top:10px;border:0;background:transparent;font-size:28px;cursor:pointer}.modal-box label{display:block;margin:12px 0;font-weight:700}.modal-box input,.modal-box select{width:100%;padding:11px;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px}@media(max-width:850px){.sidebar{position:static;width:100%;height:auto;display:flex;overflow:auto;padding:10px}.brand{display:none}.nav{min-width:max-content;text-align:center}.main{margin-right:0;width:100%;padding:15px}.topbar{align-items:flex-start;gap:12px}.cards{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}}@media(max-width:480px){.cards{grid-template-columns:1fr}.topbar{flex-direction:column}.primary{width:100%}}
+
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">مساعد<span>المبيعات</span></div>
+    <button class="nav active" data-section="dashboard">لوحة التحكم</button>
+    <button class="nav" data-section="orders">الطلبات</button>
+    <button class="nav" data-section="customers">العملاء</button>
+    <button class="nav" data-section="products">المنتجات</button>
+    <button class="nav" data-section="conversation">تحويل محادثة إلى طلب</button>
+    <button class="nav" data-section="followups">المتابعات</button>
+    <button class="nav" data-section="profit">الأرباح</button>
+    <button class="nav" data-section="offers">العروض والرسائل</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">لوحة التحكم</h1>
+        <p>مركز واحد لإدارة البيع ومتابعة العملاء.</p>
+      </div>
+      <button class="primary" id="newOrderBtn">+ طلب جديد</button>
+    </header>
+
+    <section id="dashboard" class="section active">
+      <div class="cards">
+        <div class="card"><span>مبيعات اليوم</span><strong id="salesToday">0 ج.م</strong></div>
+        <div class="card"><span>طلبات اليوم</span><strong id="ordersToday">0</strong></div>
+        <div class="card"><span>صافي الربح</span><strong id="profitToday">0 ج.م</strong></div>
+        <div class="card"><span>عملاء يحتاجون متابعة</span><strong id="followupCount">0</strong></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>آخر الطلبات</h2><button class="ghost" data-go="orders">عرض الكل</button></div>
+        <div id="recentOrders" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section id="orders" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>الطلبات</h2><button class="primary" id="addOrder">+ إضافة طلب</button></div>
+        <div id="ordersTable" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section id="customers" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>العملاء</h2></div>
+        <div id="customersTable" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section id="products" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>المنتجات</h2><button class="primary" id="addProduct">+ إضافة منتج</button></div>
+        <div id="productsTable" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section id="conversation" class="section">
+      <div class="panel">
+        <h2>تحويل محادثة العميل إلى طلب</h2>
+        <p class="muted">الصق محادثة العميل هنا. هذه النسخة التجريبية تجهز لك مكان التحليل؛ ربط الذكاء الاصطناعي الحقيقي سيكون في مرحلة الـBackend.</p>
+        <textarea id="chatInput" placeholder="مثال: عايز 2 تيشيرت أسود XL والتوصيل لسوهاج..."></textarea>
+        <button class="primary" id="analyzeChat">تحليل المحادثة</button>
+        <div id="chatResult" class="result hidden"></div>
+      </div>
+    </section>
+
+    <section id="followups" class="section">
+      <div class="panel">
+        <div class="panel-head"><h2>العملاء الذين يحتاجون متابعة</h2></div>
+        <div id="followupsTable" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section id="profit" class="section">
+      <div class="panel">
+        <h2>حاسبة صافي الربح</h2>
+        <div class="form-grid">
+          <label>سعر البيع<input id="sellPrice" type="number" value="1000"></label>
+          <label>تكلفة المنتج<input id="costPrice" type="number" value="600"></label>
+          <label>الشحن<input id="shipping" type="number" value="70"></label>
+          <label>الإعلان<input id="ads" type="number" value="100"></label>
+          <label>مصاريف أخرى<input id="otherCosts" type="number" value="30"></label>
+        </div>
+        <button class="primary" id="calcProfit">احسب الربح</button>
+        <div id="profitResult" class="profit-result">صافي الربح: 0 ج.م</div>
+      </div>
+    </section>
+
+    <section id="offers" class="section">
+      <div class="panel">
+        <h2>مولّد العروض والرسائل</h2>
+        <div class="form-grid">
+          <label>اسم المنتج<input id="offerProduct" placeholder="مثال: تيشيرت Premium"></label>
+          <label>السعر<input id="offerPrice" type="number" placeholder="500"></label>
+          <label>الخصم %<input id="offerDiscount" type="number" placeholder="20"></label>
+        </div>
+        <button class="primary" id="generateOffer">إنشاء الرسالة</button>
+        <div id="offerResult" class="result hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="close" id="closeModal">×</button>
+      <h2 id="modalTitle">إضافة</h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+const state={
+ orders:[
+  {id:'1001',customer:'أحمد محمد',total:850,status:'مؤكد',date:'اليوم'},
+  {id:'1002',customer:'محمد علي',total:620,status:'جديد',date:'اليوم'},
+  {id:'1003',customer:'سارة محمود',total:1200,status:'تم التسليم',date:'أمس'}
+ ],
+ products:[
+  {name:'تيشيرت Premium',price:450,stock:18},
+  {name:'هودي Classic',price:650,stock:9}
+ ],
+ customers:[
+  {name:'أحمد محمد',phone:'01000000000',orders:3},
+  {name:'محمد علي',phone:'01100000000',orders:1},
+  {name:'سارة محمود',phone:'01200000000',orders:5}
+ ],
+ followups:[
+  {name:'خالد حسن',reason:'سأل عن المنتج ولم يكمل الطلب',phone:'01011111111'},
+  {name:'محمود سامي',reason:'بدأ الطلب ولم يؤكده',phone:'01122222222'}
+ ]
+};
+
+const $=s=>document.querySelector(s);
+const money=n=>`${Number(n||0).toLocaleString('ar-EG')} ج.م`;
+
+function render(){
+ const sales=state.orders.reduce((a,o)=>a+Number(o.total),0);
+ $('#salesToday').textContent=money(sales);
+ $('#ordersToday').textContent=state.orders.length;
+ $('#profitToday').textContent=money(sales*0.28);
+ $('#followupCount').textContent=state.followups.length;
+ renderOrders('#recentOrders',state.orders.slice(0,5));
+ renderOrders('#ordersTable',state.orders);
+ renderCustomers();
+ renderProducts();
+ renderFollowups();
+}
+function renderOrders(sel,data){
+ if(!data.length){$(sel).innerHTML='<div class="empty">لا توجد طلبات بعد</div>';return}
+ $(sel).innerHTML=`<table class="table"><thead><tr><th>رقم الطلب</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>${data.map(o=>`<tr><td>#${o.id}</td><td>${o.customer}</td><td>${money(o.total)}</td><td><span class="badge">${o.status}</span></td><td>${o.date}</td></tr>`).join('')}</tbody></table>`;
+}
+function renderCustomers(){
+ $('#customersTable').innerHTML=`<table class="table"><thead><tr><th>العميل</th><th>الهاتف</th><th>عدد الطلبات</th></tr></thead><tbody>${state.customers.map(c=>`<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.orders}</td></tr>`).join('')}</tbody></table>`;
+}
+function renderProducts(){
+ $('#productsTable').innerHTML=`<table class="table"><thead><tr><th>المنتج</th><th>السعر</th><th>المخزون</th></tr></thead><tbody>${state.products.map(p=>`<tr><td>${p.name}</td><td>${money(p.price)}</td><td>${p.stock}</td></tr>`).join('')}</tbody></table>`;
+}
+function renderFollowups(){
+ $('#followupsTable').innerHTML=`<table class="table"><thead><tr><th>العميل</th><th>السبب</th><th>الهاتف</th><th></th></tr></thead><tbody>${state.followups.map(f=>`<tr><td>${f.name}</td><td>${f.reason}</td><td>${f.phone}</td><td><button class="ghost" onclick="copyFollowup('${f.name}')">نسخ رسالة</button></td></tr>`).join('')}</tbody></table>`;
+}
+function showSection(id){
+ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+ document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+ $('#'+id).classList.add('active');
+ const nav=document.querySelector(`[data-section="${id}"]`); if(nav) nav.classList.add('active');
+ $('#pageTitle').textContent=nav?nav.textContent:'لوحة التحكم';
+}
+document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>showSection(n.dataset.section)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.go)));
+
+function openModal(title,body){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modal').classList.remove('hidden')}
+function closeModal(){$('#modal').classList.add('hidden')}
+$('#closeModal').onclick=closeModal;
+
+function orderForm(){
+ openModal('إضافة طلب',`<label>اسم العميل<input id="mCustomer" placeholder="اسم العميل"></label><label>قيمة الطلب<input id="mTotal" type="number" placeholder="500"></label><label>الحالة<select id="mStatus"><option>جديد</option><option>مؤكد</option><option>قيد التجهيز</option></select></label><button class="primary" id="saveOrder">حفظ الطلب</button>`);
+ $('#saveOrder').onclick=()=>{const customer=$('#mCustomer').value.trim()||'عميل جديد';const total=Number($('#mTotal').value)||0;state.orders.unshift({id:String(Date.now()).slice(-6),customer,total,status:$('#mStatus').value,date:'اليوم'});closeModal();render();showSection('orders')};
+}
+$('#newOrderBtn').onclick=orderForm; $('#addOrder').onclick=orderForm;
+$('#addProduct').onclick=()=>openModal('إضافة منتج',`<label>اسم المنتج<input id="mProduct" placeholder="اسم المنتج"></label><label>السعر<input id="mPrice" type="number"></label><label>المخزون<input id="mStock" type="number"></label><button class="primary" id="saveProduct">حفظ المنتج</button>`);
+document.addEventListener('click',e=>{if(e.target.id==='saveProduct'){state.products.push({name:$('#mProduct').value||'منتج جديد',price:Number($('#mPrice').value)||0,stock:Number($('#mStock').value)||0});closeModal();render();showSection('products')}});
+
+$('#calcProfit').onclick=()=>{
+ const sell=Number($('#sellPrice').value)||0,cost=Number($('#costPrice').value)||0,ship=Number($('#shipping').value)||0,ads=Number($('#ads').value)||0,other=Number($('#otherCosts').value)||0;
+ const p=sell-cost-ship-ads-other;
+ $('#profitResult').textContent=`صافي الربح: ${money(p)} — هامش الربح: ${sell?((p/sell)*100).toFixed(1):0}%`;
+};
+$('#generateOffer').onclick=()=>{
+ const product=$('#offerProduct').value||'المنتج',price=Number($('#offerPrice').value)||0,d=Number($('#offerDiscount').value)||0,final=Math.max(0,price-(price*d/100));
+ $('#offerResult').classList.remove('hidden');
+ $('#offerResult').textContent=`🔥 عرض خاص على ${product}! السعر بدل ${money(price)} أصبح ${money(final)} فقط. العرض لفترة محدودة — اطلب الآن.`;
+};
+$('#analyzeChat').onclick=()=>{
+ const text=$('#chatInput').value.trim();
+ $('#chatResult').classList.remove('hidden');
+ $('#chatResult').innerHTML=text?`<strong>تم استقبال المحادثة.</strong><br>الخطوة التالية في النسخة المتصلة بالذكاء الاصطناعي: استخراج اسم العميل والمنتج والكمية والعنوان والإجمالي تلقائيًا من المحادثة.<br><br><button class="primary" onclick="showSection('orders')">إنشاء الطلب</button>`:'الصق محادثة أولًا ثم اضغط تحليل المحادثة.';
+};
+window.copyFollowup=name=>navigator.clipboard?.writeText(`أهلًا ${name} 👋 كنت بتسأل عن المنتج عندنا، حبيت أتابع معك وأشوف إذا كنت ما زلت مهتمًا. لو تحب أكمل لك الطلب أنا جاهز.`).then(()=>alert('تم نسخ رسالة المتابعة'));
+
+render();
+
+</script>
+</body>
+</html>
